@@ -1,0 +1,501 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bé tham gia giao thông 🚦</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --green: #20d879;
+    --yellow: #ffd43b;
+    --red: #ff4960;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Trebuchet MS", Arial, sans-serif;
+    background: linear-gradient(180deg, #b9efff, #efffd8);
+    color: #28445c;
+    text-align: center;
+    overflow-x: hidden;
+}
+
+.page {
+    width: 100%;
+    max-width: 760px;
+    margin: auto;
+    padding: 22px 16px 30px;
+}
+
+h1 {
+    margin: 5px 0 8px;
+    color: #ff6685;
+    font-size: clamp(25px, 5vw, 38px);
+    text-shadow: 2px 3px white;
+}
+
+.subtitle {
+    font-size: 16px;
+    line-height: 1.6;
+    margin: 0 auto 18px;
+}
+
+/* Khu vực đèn giao thông */
+.game-area {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0 0;
+}
+
+.traffic-light {
+    position: relative;
+    width: 150px;
+    padding: 15px 16px;
+    background: linear-gradient(90deg, #34445b, #19283c, #34445b);
+    border: 5px solid #ffffff;
+    border-radius: 30px;
+    box-shadow: 0 9px 0 #a5c5d0, 0 14px 24px #42627c45;
+    z-index: 2;
+}
+
+.lamp {
+    width: 95px;
+    height: 95px;
+    margin: 5px auto 10px;
+    border-radius: 50%;
+    border: 5px solid #18283a;
+    background: #526070;
+    opacity: 0.45;
+    transition: background 0.25s, opacity 0.25s, box-shadow 0.25s;
+}
+
+.lamp:last-child {
+    margin-bottom: 5px;
+}
+
+.lamp.red.on {
+    background: var(--red);
+    opacity: 1;
+    box-shadow: 0 0 12px var(--red), 0 0 32px #ff496080,
+                inset 0 5px 12px #ffffff80;
+}
+
+.lamp.yellow.on {
+    background: var(--yellow);
+    opacity: 1;
+    box-shadow: 0 0 12px var(--yellow), 0 0 32px #ffd43b80,
+                inset 0 5px 12px #ffffff90;
+}
+
+.lamp.green.on {
+    background: var(--green);
+    opacity: 1;
+    box-shadow: 0 0 12px var(--green), 0 0 32px #20d87980,
+                inset 0 5px 12px #ffffff90;
+}
+
+.pole {
+    width: 24px;
+    height: 45px;
+    background: linear-gradient(90deg, #7b8997, #d0dce4, #7b8997);
+}
+
+.ground {
+    width: 220px;
+    height: 23px;
+    background: #63bf77;
+    border: 4px solid white;
+    border-radius: 50%;
+    margin-top: -3px;
+}
+
+.signal-card {
+    width: 100%;
+    max-width: 420px;
+    margin: 18px auto;
+    padding: 17px;
+    background: white;
+    border: 3px solid #ffffff;
+    border-radius: 22px;
+    box-shadow: 0 6px 0 #c6e3d3;
+}
+
+.signal-emoji {
+    font-size: 38px;
+    line-height: 1.3;
+}
+
+.signal-title {
+    margin: 6px 0;
+    font-size: clamp(23px, 5vw, 30px);
+    font-weight: 900;
+}
+
+.signal-detail {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.start-btn {
+    min-width: 205px;
+    padding: 15px 27px;
+    border: 0;
+    border-radius: 50px;
+    background: #ff6485;
+    color: white;
+    font-weight: bold;
+    font-size: 21px;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #d93e65;
+    transition: transform 0.15s, box-shadow 0.15s;
+    touch-action: manipulation;
+}
+
+.start-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #d93e65;
+}
+
+.start-btn:focus-visible {
+    outline: 4px solid #375d85;
+    outline-offset: 4px;
+}
+
+.status {
+    min-height: 26px;
+    margin: 17px 0 8px;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.rules {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 23px;
+}
+
+.rule {
+    padding: 12px 5px;
+    background: #ffffffd9;
+    border-radius: 17px;
+    box-shadow: 0 4px 0 #c6e3d3;
+}
+
+.rule .emoji {
+    font-size: 27px;
+}
+
+.rule strong {
+    display: block;
+    margin: 5px 0;
+    font-size: 15px;
+}
+
+.rule p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+footer {
+    margin-top: 24px;
+    font-size: 13px;
+    color: #597589;
+}
+
+.star {
+    position: fixed;
+    pointer-events: none;
+    font-size: 19px;
+    animation: float 3s ease-in-out infinite alternate;
+    z-index: -1;
+}
+
+@keyframes float {
+    from { transform: translateY(0) rotate(-10deg); }
+    to { transform: translateY(-15px) rotate(10deg); }
+}
+
+@media (max-width: 420px) {
+    .page { padding: 18px 12px 25px; }
+    .traffic-light { width: 132px; padding: 12px; }
+    .lamp { width: 84px; height: 84px; }
+    .rules { gap: 7px; }
+    .rule p { font-size: 12px; }
+    .signal-card { padding: 14px 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="star" style="top:12%;left:7%">⭐</div>
+<div class="star" style="top:24%;right:8%;animation-delay:.8s">✨</div>
+<div class="star" style="bottom:12%;left:8%;animation-delay:1.3s">🌼</div>
+<div class="star" style="bottom:18%;right:7%;animation-delay:.5s">⭐</div>
+
+<main class="page">
+    <h1>🚦 Bé tham gia giao thông 🚗</h1>
+    <p class="subtitle">
+        Cùng quan sát đèn tín hiệu và phản xạ thật nhanh nào!<br>
+        Bé đã sẵn sàng chưa? 🌈
+    </p>
+
+    <section class="game-area" aria-label="Đèn giao thông">
+        <div class="traffic-light">
+            <div class="lamp red" id="redLamp"></div>
+            <div class="lamp yellow" id="yellowLamp"></div>
+            <div class="lamp green" id="greenLamp"></div>
+        </div>
+        <div class="pole"></div>
+        <div class="ground"></div>
+    </section>
+
+    <section class="signal-card" aria-live="polite">
+        <div class="signal-emoji" id="signalEmoji">🌟</div>
+        <div class="signal-title" id="signalTitle">Bé sẵn sàng nhé!</div>
+        <div class="signal-detail" id="signalDetail">
+            Nhấn Bắt đầu để chơi.
+        </div>
+    </section>
+
+    <button class="start-btn" id="toggleBtn" type="button">
+        ▶ Bắt đầu
+    </button>
+
+    <div class="status" id="status" aria-live="polite">
+        Nhấn nút để bắt đầu trò chơi 🎵
+    </div>
+
+    <section class="rules" aria-label="Ý nghĩa đèn giao thông">
+        <div class="rule">
+            <div class="emoji">🔴</div>
+            <strong>Đèn đỏ</strong>
+            <p>Dừng lại!<br>Không đi tiếp.</p>
+        </div>
+        <div class="rule">
+            <div class="emoji">🟡</div>
+            <strong>Đèn vàng</strong>
+            <p>Đi chậm.<br>Chú ý quan sát.</p>
+        </div>
+        <div class="rule">
+            <div class="emoji">🟢</div>
+            <strong>Đèn xanh</strong>
+            <p>Được đi khi<br>an toàn.</p>
+        </div>
+    </section>
+
+    <footer>
+        🌻 Học vui mỗi ngày – tham gia giao thông an toàn!
+    </footer>
+</main>
+
+<script>
+const lamps = {
+    red: document.getElementById("redLamp"),
+    yellow: document.getElementById("yellowLamp"),
+    green: document.getElementById("greenLamp")
+};
+
+const signalEmoji = document.getElementById("signalEmoji");
+const signalTitle = document.getElementById("signalTitle");
+const signalDetail = document.getElementById("signalDetail");
+const toggleBtn = document.getElementById("toggleBtn");
+const statusText = document.getElementById("status");
+
+const signals = [
+    {
+        color: "red",
+        emoji: "🛑",
+        title: "ĐÈN ĐỎ – DỪNG LẠI!",
+        detail: "Bé hãy dừng lại và đứng yên nhé!"
+    },
+    {
+        color: "yellow",
+        emoji: "🐢",
+        title: "ĐÈN VÀNG – ĐI CHẬM!",
+        detail: "Đi chậm, chú ý quan sát và chuẩn bị dừng."
+    },
+    {
+        color: "green",
+        emoji: "🚶",
+        title: "ĐÈN XANH – ĐƯỢC ĐI!",
+        detail: "Bé có thể đi khi đường an toàn nhé!"
+    }
+];
+
+let playing = false;
+let changeTimer = null;
+let audioContext = null;
+let musicTimer = null;
+let musicIndex = 0;
+
+// Nhạc vui được tạo bằng Web Audio API, không cần tải file nhạc.
+const melody = [
+    523.25, 659.25, 783.99, 659.25,
+    587.33, 698.46, 880.00, 698.46,
+    659.25, 783.99, 987.77, 783.99,
+    698.46, 659.25, 587.33, 523.25
+];
+
+function playNote(frequency, duration = 0.20) {
+    if (!audioContext || audioContext.state !== "running") return;
+
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.value = frequency;
+
+    gain.gain.setValueAtTime(0.0001, audioContext.currentTime);
+    gain.gain.exponentialRampToValueAtTime(
+        0.045, audioContext.currentTime + 0.025
+    );
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001, audioContext.currentTime + duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + duration + 0.02);
+}
+
+async function startMusic() {
+    try {
+        const AudioContextClass =
+            window.AudioContext || window.webkitAudioContext;
+
+        if (!AudioContextClass) {
+            statusText.textContent =
+                "Trình duyệt chưa hỗ trợ nhạc nền. Bé vẫn chơi được nhé!";
+            return;
+        }
+
+        if (!audioContext) {
+            audioContext = new AudioContextClass();
+        }
+
+        await audioContext.resume();
+
+        if (!playing || musicTimer) return;
+
+        musicIndex = 0;
+
+        function nextNote() {
+            if (!playing) return;
+
+            playNote(melody[musicIndex], 0.20);
+            musicIndex = (musicIndex + 1) % melody.length;
+        }
+
+        nextNote();
+        musicTimer = setInterval(nextNote, 260);
+    } catch (error) {
+        // Trò chơi vẫn hoạt động nếu thiết bị chặn âm thanh.
+        statusText.textContent =
+            "Âm thanh chưa bật được. Bé vẫn chơi bình thường nhé!";
+    }
+}
+
+function stopMusic() {
+    if (musicTimer) {
+        clearInterval(musicTimer);
+        musicTimer = null;
+    }
+
+    if (audioContext && audioContext.state === "running") {
+        audioContext.suspend().catch(() => {});
+    }
+}
+
+function showSignal(signal) {
+    Object.values(lamps).forEach(lamp => {
+        lamp.classList.remove("on");
+    });
+
+    lamps[signal.color].classList.add("on");
+
+    signalEmoji.textContent = signal.emoji;
+    signalTitle.textContent = signal.title;
+    signalDetail.textContent = signal.detail;
+}
+
+function changeSignal() {
+    if (!playing) return;
+
+    const current = signals.find(signal =>
+        lamps[signal.color].classList.contains("on")
+    );
+
+    // Chọn ngẫu nhiên, không lặp lại màu hiện tại ngay lập tức.
+    const choices = signals.filter(signal =>
+        !current || signal.color !== current.color
+    );
+
+    const next = choices[Math.floor(Math.random() * choices.length)];
+    showSignal(next);
+
+    // Khoảng thời gian thay đổi cũng ngẫu nhiên.
+    const nextDelay = 1300 + Math.random() * 1900;
+    changeTimer = setTimeout(changeSignal, nextDelay);
+}
+
+function startGame() {
+    playing = true;
+
+    toggleBtn.textContent = "⏸ Dừng";
+    statusText.textContent = "Quan sát thật nhanh nhé, bé ơi! 🎵";
+
+    // Chọn một màu ngẫu nhiên ngay khi bắt đầu.
+    const first = signals[Math.floor(Math.random() * signals.length)];
+    showSignal(first);
+
+    changeTimer = setTimeout(changeSignal, 1300 + Math.random() * 1900);
+
+    // Âm thanh được khởi động từ thao tác chạm của người chơi.
+    startMusic();
+}
+
+function pauseGame() {
+    playing = false;
+
+    if (changeTimer) {
+        clearTimeout(changeTimer);
+        changeTimer = null;
+    }
+
+    stopMusic();
+
+    toggleBtn.textContent = "▶ Bắt đầu";
+    statusText.textContent = "Trò chơi đang tạm dừng. Nghỉ một chút nhé! 🌼";
+}
+
+toggleBtn.addEventListener("click", () => {
+    if (playing) {
+        pauseGame();
+    } else {
+        startGame();
+    }
+});
+</script>
+</body>
+</html>
